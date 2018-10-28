@@ -260,22 +260,26 @@ def createRepositoryClass(directory, packagePrefix, resourceName, idClass, newli
 
 def run():
     cwd = os.getcwd()
-    directory = input('Enter directory to generate package: (default '+ cwd+') ')
-    if (len(directory) == 0):
-        directory = cwd
-    if not os.path.isdir(directory):
+    
+    directory = input('Enter directory in which to generate package: (default '+ cwd+') ')
+    while not os.path.isdir(directory):
+        if (len(directory) == 0):
+            directory = cwd
+            break
         if directory[0] != slash:
             directory = cwd + (slash if cwd[-1] != slash else '') + directory
         else:
             directory = (cwd[:-1] if cwd[-1] == slash else cwd) + directory
         print(directory)
         if not os.path.isdir(directory):
-            print('Invalid directory')
-            return
+            directory = input('Invalid directory: (default ' + cwd +') ')
     if directory[:-1] != slash:
         directory += slash
+
     packagePrefix = input('Enter full prefix for package name: (ex: com.ianswift.rest) ')
+
     resourceName = input('Enter singular name of the resource: (ex: Item) ')
+
     idClass = input('Enter class for resource id: (default Integer) ')
     customPackage = False
     if idClass == '':
@@ -283,13 +287,14 @@ def run():
     elif idClass not in ['Boolean', 'Byte', 'Character', 'Double', 'Float', 'Integer', 'Long', 'Number', 'Object', 'Short', 'String']:
         customPackage = input('Custom class detected! If class is from java.lang press enter to skip. Otherwise, enter package name: ')
         customPackage = customPackage if customPackage != '' else False
-    newline = input('Use Windows newlines? (default no): ')
+
+    newline = input('Use Unix newlines? (default yes): ')
     while (newline not in ['Y','y','YES','yes', 'N', 'n', 'NO', 'no', '']):
         newline = input('Please enter yes or no: ')
-    if (newline in ['Y', 'y', 'YES', 'yes']):
-        newline = '\r\n'
-    else:
+    if (newline in ['Y', 'y', 'YES', 'yes', '']):
         newline = '\n'
+    else:
+        newline = '\r\n'
 
     directory = createRootDirectory(directory, resourceName) + slash
     createControllerClass(directory, packagePrefix, resourceName, idClass, newline, customPackage)
